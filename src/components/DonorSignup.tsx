@@ -2,11 +2,48 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { User, Droplets, MapPin, Calendar } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 const DonorSignup = () => {
   const [selectedGroup, setSelectedGroup] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!fullName || !email || !phone || !selectedGroup || !city) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase.from("donors").insert({
+      full_name: fullName,
+      email,
+      phone,
+      blood_group: selectedGroup,
+      city,
+    });
+    setLoading(false);
+
+    if (error) {
+      toast.error("Registration failed. Please try again.");
+      console.error(error);
+      return;
+    }
+
+    toast.success("You're registered as a donor! 🎉");
+    setFullName("");
+    setEmail("");
+    setPhone("");
+    setSelectedGroup("");
+    setCity("");
+  };
 
   return (
     <section id="become-a-donor" className="py-24 bg-warm">
@@ -61,16 +98,22 @@ const DonorSignup = () => {
               <input
                 type="text"
                 placeholder="Full name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
               />
               <input
                 type="email"
                 placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
               />
               <input
                 type="tel"
                 placeholder="Phone number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
               />
 
@@ -98,11 +141,19 @@ const DonorSignup = () => {
               <input
                 type="text"
                 placeholder="City / Area"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
                 className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
               />
 
-              <Button variant="hope" size="xl" className="w-full">
-                Register as Donor
+              <Button
+                variant="hope"
+                size="xl"
+                className="w-full"
+                onClick={handleSubmit}
+                disabled={loading}
+              >
+                {loading ? "Registering..." : "Register as Donor"}
               </Button>
             </div>
           </motion.div>

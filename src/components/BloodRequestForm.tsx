@@ -1,14 +1,59 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, MapPin, Phone } from "lucide-react";
+import { AlertCircle, MapPin, Phone, User, Droplets } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const urgencyLevels = ["Critical", "Urgent", "Normal"];
 
+interface Donor {
+  id: string;
+  full_name: string;
+  phone: string;
+  city: string;
+  blood_group: string;
+}
+
 const BloodRequestForm = () => {
   const [selectedGroup, setSelectedGroup] = useState("");
   const [urgency, setUrgency] = useState("");
+  const [location, setLocation] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  const [donors, setDonors] = useState<Donor[]>([]);
+  const [searched, setSearched] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!selectedGroup) {
+      toast.error("Please select a blood group");
+      return;
+    }
+
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("donors")
+      .select("id, full_name, phone, city, blood_group")
+      .eq("blood_group", selectedGroup)
+      .eq("is_available", true);
+
+    setLoading(false);
+    setSearched(true);
+
+    if (error) {
+      toast.error("Something went wrong. Please try again.");
+      console.error(error);
+      return;
+    }
+
+    setDonors((data as Donor[]) || []);
+    if (data && data.length > 0) {
+      toast.success(`Found ${data.length} donor(s) with ${selectedGroup}`);
+    } else {
+      toast.info(`No donors found for ${selectedGroup} yet.`);
+    }
+  };
 
   return (
     <section id="request-blood" className="py-24">
@@ -90,6 +135,8 @@ const BloodRequestForm = () => {
               <input
                 type="text"
                 placeholder="Enter hospital or area name"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
                 className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
               />
             </div>
@@ -103,18 +150,82 @@ const BloodRequestForm = () => {
               <input
                 type="tel"
                 placeholder="Your phone number"
+                value={contactNumber}
+                onChange={(e) => setContactNumber(e.target.value)}
                 className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
               />
             </div>
 
-            <Button variant="hero" size="xl" className="w-full">
-              Submit Blood Request
+            <Button
+              variant="hero"
+              size="xl"
+              className="w-full"
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? "Searching..." : "Submit Blood Request"}
             </Button>
 
             <p className="text-xs text-muted-foreground text-center mt-4">
               Your contact info will only be shared with consenting donors.
             </p>
           </motion.div>
+
+          {/* Donor Results */}
+          {searched && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-10"
+            >
+              <h3 className="font-display text-2xl font-bold text-foreground mb-6 text-center">
+                {donors.length > 0
+                  ? `Available Donors for ${selectedGroup}`
+                  : "No Donors Found"}
+              </h3>
+
+              {donors.length > 0 ? (
+                <div className="grid gap-4">
+                  {donors.map((donor) => (
+                    <div
+                      key={donor.id}
+                      className="bg-card rounded-xl border border-border p-5 flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-coral-light flex items-center justify-center">
+                          <User className="w-6 h-6 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">
+                            {donor.full_name}
+                          </p>
+                          <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            <MapPin className="w-3 h-3" /> {donor.city}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className="bg-primary/10 text-primary font-bold text-sm px-3 py-1 rounded-full">
+                          {donor.blood_group}
+                        </span>
+                        <a
+                          href={`tel:${donor.phone}`}
+                          className="text-sm text-primary font-medium hover:underline flex items-center gap-1"
+                        >
+                          <Phone className="w-4 h-4" /> Call
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground">
+                  No donors with blood group {selectedGroup} are available right
+                  now. Please try again later.
+                </p>
+              )}
+            </motion.div>
+          )}
         </div>
       </div>
     </section>
