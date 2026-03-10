@@ -33,9 +33,11 @@ const Navbar = () => {
               {item}
             </a>
           ))}
-          <Button variant="hero" size="default">
-            Donate Now
-          </Button>
+          <Link to="/donor-register">
+            <Button variant="hero" size="default">
+              Donate Now
+            </Button>
+          </Link>
         </div>
 
         {/* Mobile toggle */}
