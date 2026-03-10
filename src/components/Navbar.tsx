@@ -67,9 +67,11 @@ const Navbar = () => {
                 {item}
               </a>
             ))}
-            <Button variant="hero" size="default">
-              Donate Now
-            </Button>
+            <Link to="/donor-register" onClick={() => setIsOpen(false)}>
+              <Button variant="hero" size="default">
+                Donate Now
+              </Button>
+            </Link>
           </div>
         </motion.div>
       )}
