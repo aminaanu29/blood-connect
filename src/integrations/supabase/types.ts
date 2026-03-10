@@ -23,7 +23,10 @@ export type Database = {
           full_name: string
           id: string
           is_available: boolean
+          last_donation_date: string | null
           phone: string
+          state: string | null
+          user_id: string | null
         }
         Insert: {
           blood_group: string
@@ -33,7 +36,10 @@ export type Database = {
           full_name: string
           id?: string
           is_available?: boolean
+          last_donation_date?: string | null
           phone: string
+          state?: string | null
+          user_id?: string | null
         }
         Update: {
           blood_group?: string
@@ -43,7 +49,10 @@ export type Database = {
           full_name?: string
           id?: string
           is_available?: boolean
+          last_donation_date?: string | null
           phone?: string
+          state?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

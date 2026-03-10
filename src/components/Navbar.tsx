@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Heart, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const navItems = ["How It Works", "Request Blood", "Become a Donor", "NSS Groups"];
 
@@ -32,9 +33,11 @@ const Navbar = () => {
               {item}
             </a>
           ))}
-          <Button variant="hero" size="default">
-            Donate Now
-          </Button>
+          <Link to="/donor-register">
+            <Button variant="hero" size="default">
+              Donate Now
+            </Button>
+          </Link>
         </div>
 
         {/* Mobile toggle */}
@@ -64,9 +67,11 @@ const Navbar = () => {
                 {item}
               </a>
             ))}
-            <Button variant="hero" size="default">
-              Donate Now
-            </Button>
+            <Link to="/donor-register" onClick={() => setIsOpen(false)}>
+              <Button variant="hero" size="default">
+                Donate Now
+              </Button>
+            </Link>
           </div>
         </motion.div>
       )}
