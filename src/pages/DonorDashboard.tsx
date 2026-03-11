@@ -33,7 +33,7 @@ interface BloodRequest {
 const DonorDashboard = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<DonorProfile | null>(null);
-  const [matchingRequests, setMatchingRequests] = useState<MatchingDonor[]>([]);
+  const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
