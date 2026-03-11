@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Heart, MapPin, Phone, Droplets, LogOut, User, Calendar, CheckCircle, XCircle } from "lucide-react";
+import { Heart, MapPin, Phone, Droplets, LogOut, User, Calendar, CheckCircle, XCircle, AlertCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -19,18 +19,32 @@ interface DonorProfile {
   created_at: string;
 }
 
-interface MatchingDonor {
+interface BloodRequest {
   id: string;
-  full_name: string;
-  phone: string;
-  city: string;
   blood_group: string;
+  urgency: string;
+  location: string | null;
+  city: string | null;
+  contact_number: string | null;
+  status: string;
+  created_at: string;
 }
+
+const getTimeAgo = (dateStr: string) => {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+};
 
 const DonorDashboard = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<DonorProfile | null>(null);
-  const [matchingRequests, setMatchingRequests] = useState<MatchingDonor[]>([]);
+  const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -55,21 +69,43 @@ const DonorDashboard = () => {
 
       setProfile(donor as DonorProfile);
 
-      // Find other donors in the same city with same blood group (simulating "requests")
-      const { data: nearby } = await supabase
-        .from("donors")
-        .select("id, full_name, phone, city, blood_group")
+      // Fetch active blood requests matching donor's blood group
+      const { data: requests } = await supabase
+        .from("blood_requests")
+        .select("*")
         .eq("blood_group", donor.blood_group)
-        .eq("city", donor.city)
-        .eq("is_available", true)
-        .neq("id", donor.id)
-        .limit(10);
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(20);
 
-      setMatchingRequests((nearby as MatchingDonor[]) || []);
+      setBloodRequests((requests as BloodRequest[]) || []);
       setLoading(false);
     };
 
     loadDashboard();
+
+    // Realtime subscription for new blood requests
+    const channel = supabase
+      .channel("blood-requests-realtime")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "blood_requests" },
+        (payload) => {
+          const newRequest = payload.new as BloodRequest;
+          setProfile((current) => {
+            if (current && newRequest.blood_group === current.blood_group && newRequest.status === "active") {
+              setBloodRequests((prev) => [newRequest, ...prev]);
+              toast.info(`New ${newRequest.blood_group} blood request!`);
+            }
+            return current;
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [navigate]);
 
   const handleLogout = async () => {
@@ -207,52 +243,70 @@ const DonorDashboard = () => {
             </div>
           </div>
 
-          {/* Matching Donors / Requests */}
+          {/* Matching Blood Requests */}
           <div className="bg-card rounded-2xl border border-border p-6 md:p-8 shadow-sm">
             <h2 className="font-display text-xl font-bold text-foreground mb-2 flex items-center gap-2">
               <Droplets className="w-5 h-5 text-primary" />
-              Donors Near You ({profile.blood_group})
+              Blood Requests for {profile.blood_group}
             </h2>
             <p className="text-sm text-muted-foreground mb-6">
-              Other available {profile.blood_group} donors in {profile.city} — potential partners for blood drives.
+              Active requests matching your blood group — reach out if you can help.
             </p>
 
-            {matchingRequests.length > 0 ? (
+            {bloodRequests.length > 0 ? (
               <div className="space-y-3">
-                {matchingRequests.map((donor) => (
-                  <div
-                    key={donor.id}
-                    className="flex items-center justify-between p-4 rounded-xl border border-border bg-background"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-coral-light flex items-center justify-center">
-                        <User className="w-5 h-5 text-primary" />
+                {bloodRequests.map((req) => {
+                  const timeAgo = getTimeAgo(req.created_at);
+                  return (
+                    <div
+                      key={req.id}
+                      className="p-4 rounded-xl border border-border bg-background"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="bg-primary/10 text-primary font-bold text-xs px-2.5 py-0.5 rounded-full">
+                            {req.blood_group}
+                          </span>
+                          <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
+                            req.urgency === "Critical"
+                              ? "bg-destructive/10 text-destructive"
+                              : req.urgency === "Urgent"
+                              ? "bg-orange-100 text-orange-700"
+                              : "bg-muted text-muted-foreground"
+                          }`}>
+                            <AlertCircle className="w-3 h-3 inline mr-1" />
+                            {req.urgency}
+                          </span>
+                        </div>
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> {timeAgo}
+                        </span>
                       </div>
-                      <div>
-                        <p className="font-medium text-foreground text-sm">{donor.full_name}</p>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <MapPin className="w-3 h-3" /> {donor.city}
-                        </p>
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          {req.location && (
+                            <p className="text-sm text-foreground flex items-center gap-1">
+                              <MapPin className="w-3.5 h-3.5 text-muted-foreground" /> {req.location}
+                            </p>
+                          )}
+                        </div>
+                        {req.contact_number && (
+                          <a
+                            href={`tel:${req.contact_number}`}
+                            className="text-xs text-primary font-medium hover:underline flex items-center gap-1"
+                          >
+                            <Phone className="w-3.5 h-3.5" /> Call Requester
+                          </a>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="bg-primary/10 text-primary font-bold text-xs px-2.5 py-0.5 rounded-full">
-                        {donor.blood_group}
-                      </span>
-                      <a
-                        href={`tel:${donor.phone}`}
-                        className="text-xs text-primary font-medium hover:underline flex items-center gap-1"
-                      >
-                        <Phone className="w-3.5 h-3.5" /> Call
-                      </a>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center py-10">
                 <Droplets className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-                <p className="text-muted-foreground">No other {profile.blood_group} donors found in {profile.city} yet.</p>
+                <p className="text-muted-foreground">No active requests for {profile.blood_group} right now. Check back later!</p>
               </div>
             )}
           </div>
