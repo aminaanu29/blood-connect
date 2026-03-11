@@ -119,7 +119,7 @@ const DonorRegister = () => {
     }
 
     toast.success(
-      "Registration successful! Please check your email to verify your account."
+      "Registration successful! You can now log in as a donor and help save lives."
     );
     navigate("/donor-login");
   };

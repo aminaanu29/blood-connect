@@ -33,7 +33,7 @@ const DonorLogin = () => {
     }
 
     toast.success("Welcome back! 🎉");
-    navigate("/");
+    navigate("/donor-dashboard");
   };
 
   const inputClass =
