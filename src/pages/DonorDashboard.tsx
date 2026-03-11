@@ -58,21 +58,43 @@ const DonorDashboard = () => {
 
       setProfile(donor as DonorProfile);
 
-      // Find other donors in the same city with same blood group (simulating "requests")
-      const { data: nearby } = await supabase
-        .from("donors")
-        .select("id, full_name, phone, city, blood_group")
+      // Fetch active blood requests matching donor's blood group
+      const { data: requests } = await supabase
+        .from("blood_requests")
+        .select("*")
         .eq("blood_group", donor.blood_group)
-        .eq("city", donor.city)
-        .eq("is_available", true)
-        .neq("id", donor.id)
-        .limit(10);
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(20);
 
-      setMatchingRequests((nearby as MatchingDonor[]) || []);
+      setBloodRequests((requests as BloodRequest[]) || []);
       setLoading(false);
     };
 
     loadDashboard();
+
+    // Realtime subscription for new blood requests
+    const channel = supabase
+      .channel("blood-requests-realtime")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "blood_requests" },
+        (payload) => {
+          const newRequest = payload.new as BloodRequest;
+          setProfile((current) => {
+            if (current && newRequest.blood_group === current.blood_group && newRequest.status === "active") {
+              setBloodRequests((prev) => [newRequest, ...prev]);
+              toast.info(`New ${newRequest.blood_group} blood request!`);
+            }
+            return current;
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [navigate]);
 
   const handleLogout = async () => {
