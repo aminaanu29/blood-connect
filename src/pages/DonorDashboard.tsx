@@ -19,12 +19,15 @@ interface DonorProfile {
   created_at: string;
 }
 
-interface MatchingDonor {
+interface BloodRequest {
   id: string;
-  full_name: string;
-  phone: string;
-  city: string;
   blood_group: string;
+  urgency: string;
+  location: string | null;
+  city: string | null;
+  contact_number: string | null;
+  status: string;
+  created_at: string;
 }
 
 const DonorDashboard = () => {
