@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Heart, MapPin, Phone, Droplets, LogOut, User, Calendar, CheckCircle, XCircle } from "lucide-react";
+import { Heart, MapPin, Phone, Droplets, LogOut, User, Calendar, CheckCircle, XCircle, AlertCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
