@@ -32,6 +32,24 @@ const BloodRequestForm = () => {
     }
 
     setLoading(true);
+
+    // 1. Insert the blood request into the database
+    const { error: insertError } = await supabase.from("blood_requests").insert({
+      blood_group: selectedGroup,
+      urgency: urgency || "Normal",
+      location: location || null,
+      city: location || null,
+      contact_number: contactNumber || null,
+    });
+
+    if (insertError) {
+      setLoading(false);
+      toast.error("Failed to submit request. Please try again.");
+      console.error(insertError);
+      return;
+    }
+
+    // 2. Search for matching donors
     const { data, error } = await supabase
       .from("donors")
       .select("id, full_name, phone, city, blood_group")
@@ -42,16 +60,16 @@ const BloodRequestForm = () => {
     setSearched(true);
 
     if (error) {
-      toast.error("Something went wrong. Please try again.");
+      toast.error("Request saved but donor search failed.");
       console.error(error);
       return;
     }
 
     setDonors((data as Donor[]) || []);
     if (data && data.length > 0) {
-      toast.success(`Found ${data.length} donor(s) with ${selectedGroup}`);
+      toast.success(`Request submitted! Found ${data.length} donor(s) with ${selectedGroup}`);
     } else {
-      toast.info(`No donors found for ${selectedGroup} yet.`);
+      toast.success("Request submitted! Matching donors will see it on their dashboard.");
     }
   };
 
