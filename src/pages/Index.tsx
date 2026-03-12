@@ -13,7 +13,7 @@ const Index = () => {
       <HeroSection />
       <HowItWorks />
       <BloodRequestForm />
-      <DonorSignup />
+      
       <NSSSection />
       <Footer />
     </div>
