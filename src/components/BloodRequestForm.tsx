@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, MapPin, Phone, User, Droplets } from "lucide-react";
+import { AlertCircle, MapPin, Phone, User, Droplets, ChevronDown, ChevronUp, Calendar, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -14,6 +14,10 @@ interface Donor {
   phone: string;
   city: string;
   blood_group: string;
+  state: string | null;
+  last_donation_date: string | null;
+  created_at: string;
+  is_available: boolean;
 }
 
 const BloodRequestForm = () => {
