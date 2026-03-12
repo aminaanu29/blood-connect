@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import HowItWorks from "@/components/HowItWorks";
 import BloodRequestForm from "@/components/BloodRequestForm";
-import DonorSignup from "@/components/DonorSignup";
+
 import NSSSection from "@/components/NSSSection";
 import Footer from "@/components/Footer";
 
@@ -13,7 +13,7 @@ const Index = () => {
       <HeroSection />
       <HowItWorks />
       <BloodRequestForm />
-      <DonorSignup />
+      
       <NSSSection />
       <Footer />
     </div>
