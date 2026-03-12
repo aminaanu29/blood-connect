@@ -24,15 +24,25 @@ const Navbar = () => {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-8">
-          {navItems.map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {item}
-            </a>
-          ))}
+          {navItems.map((item) =>
+            item === "Become a Donor" ? (
+              <Link
+                key={item}
+                to="/donor-register"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {item}
+              </Link>
+            ) : (
+              <a
+                key={item}
+                href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {item}
+              </a>
+            )
+          )}
           <Link to="/donor-register">
             <Button variant="hero" size="default">
               Donate Now
