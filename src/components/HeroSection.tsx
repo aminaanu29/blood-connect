@@ -59,12 +59,12 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.45 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Link to="/#request-blood">
+            <a href="#request-blood">
               <Button variant="hero" size="xl">
                 Request Blood Now
                 <ArrowRight className="w-5 h-5" />
               </Button>
-            </Link>
+            </a>
             <Link to="/donor-register">
               <Button variant="hero-outline" size="xl">
                 Become a Donor
