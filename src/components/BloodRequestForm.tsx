@@ -28,6 +28,7 @@ const BloodRequestForm = () => {
   const [donors, setDonors] = useState<Donor[]>([]);
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [expandedDonor, setExpandedDonor] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (!selectedGroup) {
