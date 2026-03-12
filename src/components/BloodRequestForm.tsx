@@ -57,7 +57,7 @@ const BloodRequestForm = () => {
     // 2. Search for matching donors
     const { data, error } = await supabase
       .from("donors")
-      .select("id, full_name, phone, city, blood_group")
+      .select("id, full_name, phone, city, blood_group, state, last_donation_date, created_at, is_available")
       .eq("blood_group", selectedGroup)
       .eq("is_available", true);
 
