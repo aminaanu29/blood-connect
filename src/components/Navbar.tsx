@@ -43,7 +43,7 @@ const Navbar = () => {
               </a>
             )
           )}
-          <Link to="/donor-register">
+          <Link to="/donor-login">
             <Button variant="hero" size="default">
               Donate Now
             </Button>
