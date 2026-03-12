@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, MapPin, Phone, User, Droplets } from "lucide-react";
+import { AlertCircle, MapPin, Phone, User, Droplets, ChevronDown, ChevronUp, Calendar, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -14,6 +14,10 @@ interface Donor {
   phone: string;
   city: string;
   blood_group: string;
+  state: string | null;
+  last_donation_date: string | null;
+  created_at: string;
+  is_available: boolean;
 }
 
 const BloodRequestForm = () => {
@@ -24,6 +28,7 @@ const BloodRequestForm = () => {
   const [donors, setDonors] = useState<Donor[]>([]);
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [expandedDonor, setExpandedDonor] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (!selectedGroup) {
@@ -52,7 +57,7 @@ const BloodRequestForm = () => {
     // 2. Search for matching donors
     const { data, error } = await supabase
       .from("donors")
-      .select("id, full_name, phone, city, blood_group")
+      .select("id, full_name, phone, city, blood_group, state, last_donation_date, created_at, is_available")
       .eq("blood_group", selectedGroup)
       .eq("is_available", true);
 
@@ -207,32 +212,82 @@ const BloodRequestForm = () => {
                   {donors.map((donor) => (
                     <div
                       key={donor.id}
-                      className="bg-card rounded-xl border border-border p-5 flex items-center justify-between"
+                      className="bg-card rounded-xl border border-border overflow-hidden"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-coral-light flex items-center justify-center">
-                          <User className="w-6 h-6 text-primary" />
+                      <div className="p-5 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={() =>
+                              setExpandedDonor(
+                                expandedDonor === donor.id ? null : donor.id
+                              )
+                            }
+                            className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors"
+                            title="View donor details"
+                          >
+                            {expandedDonor === donor.id ? (
+                              <ChevronUp className="w-5 h-5 text-primary" />
+                            ) : (
+                              <User className="w-6 h-6 text-primary" />
+                            )}
+                          </button>
+                          <div>
+                            <p className="font-semibold text-foreground">
+                              {donor.full_name}
+                            </p>
+                            <p className="text-sm text-muted-foreground flex items-center gap-1">
+                              <MapPin className="w-3 h-3" /> {donor.city}{donor.state ? `, ${donor.state}` : ""}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-semibold text-foreground">
-                            {donor.full_name}
-                          </p>
-                          <p className="text-sm text-muted-foreground flex items-center gap-1">
-                            <MapPin className="w-3 h-3" /> {donor.city}
-                          </p>
+                        <div className="flex items-center gap-4">
+                          <span className="bg-primary/10 text-primary font-bold text-sm px-3 py-1 rounded-full">
+                            {donor.blood_group}
+                          </span>
+                          <a
+                            href={`tel:${donor.phone}`}
+                            className="text-sm text-primary font-medium hover:underline flex items-center gap-1"
+                          >
+                            <Phone className="w-4 h-4" /> Call
+                          </a>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <span className="bg-primary/10 text-primary font-bold text-sm px-3 py-1 rounded-full">
-                          {donor.blood_group}
-                        </span>
-                        <a
-                          href={`tel:${donor.phone}`}
-                          className="text-sm text-primary font-medium hover:underline flex items-center gap-1"
+
+                      {/* Expanded Donor Details */}
+                      {expandedDonor === donor.id && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="border-t border-border bg-muted/30 px-5 py-4"
                         >
-                          <Phone className="w-4 h-4" /> Call
-                        </a>
-                      </div>
+                          <h4 className="text-sm font-semibold text-foreground mb-3">Donor Record</h4>
+                          <div className="grid grid-cols-2 gap-3 text-sm">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Droplets className="w-4 h-4 text-primary" />
+                              <span>Blood Group: <strong className="text-foreground">{donor.blood_group}</strong></span>
+                            </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Calendar className="w-4 h-4 text-primary" />
+                              <span>Last Donation: <strong className="text-foreground">
+                                {donor.last_donation_date
+                                  ? new Date(donor.last_donation_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+                                  : "No record"}
+                              </strong></span>
+                            </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Clock className="w-4 h-4 text-primary" />
+                              <span>Registered: <strong className="text-foreground">
+                                {new Date(donor.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                              </strong></span>
+                            </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <MapPin className="w-4 h-4 text-primary" />
+                              <span>Location: <strong className="text-foreground">{donor.city}{donor.state ? `, ${donor.state}` : ""}</strong></span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
                     </div>
                   ))}
                 </div>
