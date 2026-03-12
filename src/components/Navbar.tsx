@@ -67,16 +67,27 @@ const Navbar = () => {
           className="md:hidden bg-background border-b border-border"
         >
           <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
-            {navItems.map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                {item}
-              </a>
-            ))}
+            {navItems.map((item) =>
+              item === "Become a Donor" ? (
+                <Link
+                  key={item}
+                  to="/donor-register"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item}
+                </Link>
+              ) : (
+                <a
+                  key={item}
+                  href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item}
+                </a>
+              )
+            )}
             <Link to="/donor-register" onClick={() => setIsOpen(false)}>
               <Button variant="hero" size="default">
                 Donate Now
