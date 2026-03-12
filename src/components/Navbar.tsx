@@ -43,7 +43,7 @@ const Navbar = () => {
               </a>
             )
           )}
-          <Link to="/donor-register">
+          <Link to="/donor-login">
             <Button variant="hero" size="default">
               Donate Now
             </Button>
@@ -88,7 +88,7 @@ const Navbar = () => {
                 </a>
               )
             )}
-            <Link to="/donor-register" onClick={() => setIsOpen(false)}>
+            <Link to="/donor-login" onClick={() => setIsOpen(false)}>
               <Button variant="hero" size="default">
                 Donate Now
               </Button>
