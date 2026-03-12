@@ -271,13 +271,16 @@ const DonorRegister = () => {
                 <label className="block text-sm font-medium text-foreground mb-1.5">
                   State *
                 </label>
-                <input
-                  type="text"
-                  placeholder="State"
+                <select
                   value={form.state}
                   onChange={(e) => set("state", e.target.value)}
-                  className={inputClass}
-                />
+                  className={`${inputClass} appearance-none`}
+                >
+                  <option value="">Select State</option>
+                  {indianStates.map((state) => (
+                    <option key={state} value={state}>{state}</option>
+                  ))}
+                </select>
                 {errors.state && (
                   <p className="text-destructive text-xs mt-1">{errors.state}</p>
                 )}
