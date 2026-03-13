@@ -27,6 +27,8 @@ interface BloodRequest {
   city: string | null;
   hospital_name: string | null;
   contact_number: string | null;
+  latitude: number | null;
+  longitude: number | null;
   status: string;
   created_at: string;
 }
@@ -260,7 +262,11 @@ const DonorDashboard = () => {
                 {bloodRequests.map((req) => {
                   const timeAgo = getTimeAgo(req.created_at);
                   const isAccepted = acceptedRequests.has(req.id);
-                  const googleMapsUrl = req.location
+
+                  // Prefer lat/lng for accurate navigation, fall back to text-based search
+                  const googleMapsUrl = req.latitude && req.longitude
+                    ? `https://www.google.com/maps/search/?api=1&query=${req.latitude},${req.longitude}`
+                    : req.location
                     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                         (req.hospital_name ? req.hospital_name + ", " : "") + req.location
                       )}`
@@ -323,10 +329,10 @@ const DonorDashboard = () => {
                                 className="text-xs gap-1"
                                 onClick={() => {
                                   setAcceptedRequests((prev) => new Set(prev).add(req.id));
-                                  toast.success("Request accepted! Hospital details are shown below.");
+                                  toast.success("Thank you for helping save a life ❤️");
                                 }}
                               >
-                                <CheckCircle className="w-3.5 h-3.5" /> Accept
+                                <CheckCircle className="w-3.5 h-3.5" /> Confirm Donation
                               </Button>
                             )}
                           </div>
@@ -340,8 +346,16 @@ const DonorDashboard = () => {
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            className="border-t border-border bg-primary/5 px-4 py-4"
+                            className="border-t border-border bg-primary/5 px-4 py-5"
                           >
+                            <div className="text-center mb-4">
+                              <p className="text-base font-semibold text-foreground">
+                                Thank you for helping save a life ❤️
+                              </p>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Here is the hospital location for your donation.
+                              </p>
+                            </div>
                             <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-1.5">
                               <Navigation className="w-4 h-4 text-primary" /> Hospital Details
                             </h4>
@@ -371,10 +385,10 @@ const DonorDashboard = () => {
                                   href={googleMapsUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="mt-3 inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
+                                  className="mt-3 inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-3 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity shadow-md"
                                 >
                                   <Navigation className="w-4 h-4" />
-                                  Open in Google Maps
+                                  🗺️ Navigate with Google Maps
                                 </a>
                               )}
                               {!req.hospital_name && !req.location && (

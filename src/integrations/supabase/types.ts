@@ -22,7 +22,9 @@ export type Database = {
           created_at: string
           hospital_name: string | null
           id: string
+          latitude: number | null
           location: string | null
+          longitude: number | null
           status: string
           urgency: string
         }
@@ -33,7 +35,9 @@ export type Database = {
           created_at?: string
           hospital_name?: string | null
           id?: string
+          latitude?: number | null
           location?: string | null
+          longitude?: number | null
           status?: string
           urgency?: string
         }
@@ -44,7 +48,9 @@ export type Database = {
           created_at?: string
           hospital_name?: string | null
           id?: string
+          latitude?: number | null
           location?: string | null
+          longitude?: number | null
           status?: string
           urgency?: string
         }

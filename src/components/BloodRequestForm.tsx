@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, MapPin, Phone, User, Droplets, ChevronDown, ChevronUp, Calendar, Clock } from "lucide-react";
+import { AlertCircle, MapPin, Phone, User, Droplets, ChevronDown, ChevronUp, Calendar, Clock, LocateFixed } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -26,10 +26,34 @@ const BloodRequestForm = () => {
   const [hospitalName, setHospitalName] = useState("");
   const [location, setLocation] = useState("");
   const [contactNumber, setContactNumber] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [detectingLocation, setDetectingLocation] = useState(false);
   const [donors, setDonors] = useState<Donor[]>([]);
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [expandedDonor, setExpandedDonor] = useState<string | null>(null);
+
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+    setDetectingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitude(position.coords.latitude.toFixed(6));
+        setLongitude(position.coords.longitude.toFixed(6));
+        setDetectingLocation(false);
+        toast.success("Location detected successfully!");
+      },
+      () => {
+        setDetectingLocation(false);
+        toast.error("Unable to detect location. Please enter coordinates manually.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   const handleSubmit = async () => {
     if (!selectedGroup) {
@@ -40,6 +64,15 @@ const BloodRequestForm = () => {
     setLoading(true);
 
     // 1. Insert the blood request into the database
+    const parsedLat = latitude ? parseFloat(latitude) : null;
+    const parsedLng = longitude ? parseFloat(longitude) : null;
+
+    if ((latitude && isNaN(parsedLat!)) || (longitude && isNaN(parsedLng!))) {
+      toast.error("Please enter valid latitude and longitude values");
+      setLoading(false);
+      return;
+    }
+
     const { error: insertError } = await supabase.from("blood_requests").insert({
       blood_group: selectedGroup,
       urgency: urgency || "Normal",
@@ -47,6 +80,8 @@ const BloodRequestForm = () => {
       location: location || null,
       city: location || null,
       contact_number: contactNumber || null,
+      latitude: parsedLat,
+      longitude: parsedLng,
     });
 
     if (insertError) {
@@ -178,6 +213,42 @@ const BloodRequestForm = () => {
                 onChange={(e) => setLocation(e.target.value)}
                 className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
               />
+            </div>
+
+            {/* Hospital Location Coordinates */}
+            <div className="mb-8">
+              <label className="block text-sm font-medium text-foreground mb-3">
+                <MapPin className="w-4 h-4 inline mr-1" />
+                Hospital Coordinates (for accurate navigation)
+              </label>
+              <div className="flex gap-3 mb-3">
+                <input
+                  type="text"
+                  placeholder="Latitude (e.g. 11.2588)"
+                  value={latitude}
+                  onChange={(e) => setLatitude(e.target.value)}
+                  className="flex-1 h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+                />
+                <input
+                  type="text"
+                  placeholder="Longitude (e.g. 75.7804)"
+                  value={longitude}
+                  onChange={(e) => setLongitude(e.target.value)}
+                  className="flex-1 h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleDetectLocation}
+                disabled={detectingLocation}
+                className="inline-flex items-center gap-2 text-sm text-primary font-medium hover:underline disabled:opacity-50"
+              >
+                <LocateFixed className={`w-4 h-4 ${detectingLocation ? "animate-spin" : ""}`} />
+                {detectingLocation ? "Detecting..." : "Auto-detect hospital location"}
+              </button>
+              <p className="text-xs text-muted-foreground mt-2">
+                Tip: Use auto-detect while at the hospital for accurate coordinates, or find them on Google Maps.
+              </p>
             </div>
 
             {/* Contact */}
