@@ -43,6 +43,7 @@ const BloodRequestForm = () => {
     const { error: insertError } = await supabase.from("blood_requests").insert({
       blood_group: selectedGroup,
       urgency: urgency || "Normal",
+      hospital_name: hospitalName || null,
       location: location || null,
       city: location || null,
       contact_number: contactNumber || null,
