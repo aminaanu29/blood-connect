@@ -25,6 +25,7 @@ interface BloodRequest {
   urgency: string;
   location: string | null;
   city: string | null;
+  hospital_name: string | null;
   contact_number: string | null;
   status: string;
   created_at: string;
