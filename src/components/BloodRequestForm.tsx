@@ -215,6 +215,42 @@ const BloodRequestForm = () => {
               />
             </div>
 
+            {/* Hospital Location Coordinates */}
+            <div className="mb-8">
+              <label className="block text-sm font-medium text-foreground mb-3">
+                <MapPin className="w-4 h-4 inline mr-1" />
+                Hospital Coordinates (for accurate navigation)
+              </label>
+              <div className="flex gap-3 mb-3">
+                <input
+                  type="text"
+                  placeholder="Latitude (e.g. 11.2588)"
+                  value={latitude}
+                  onChange={(e) => setLatitude(e.target.value)}
+                  className="flex-1 h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+                />
+                <input
+                  type="text"
+                  placeholder="Longitude (e.g. 75.7804)"
+                  value={longitude}
+                  onChange={(e) => setLongitude(e.target.value)}
+                  className="flex-1 h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleDetectLocation}
+                disabled={detectingLocation}
+                className="inline-flex items-center gap-2 text-sm text-primary font-medium hover:underline disabled:opacity-50"
+              >
+                <LocateFixed className={`w-4 h-4 ${detectingLocation ? "animate-spin" : ""}`} />
+                {detectingLocation ? "Detecting..." : "Auto-detect hospital location"}
+              </button>
+              <p className="text-xs text-muted-foreground mt-2">
+                Tip: Use auto-detect while at the hospital for accurate coordinates, or find them on Google Maps.
+              </p>
+            </div>
+
             {/* Contact */}
             <div className="mb-8">
               <label className="block text-sm font-medium text-foreground mb-3">

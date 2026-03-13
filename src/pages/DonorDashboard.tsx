@@ -385,10 +385,10 @@ const DonorDashboard = () => {
                                   href={googleMapsUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="mt-3 inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
+                                  className="mt-3 inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-3 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity shadow-md"
                                 >
                                   <Navigation className="w-4 h-4" />
-                                  Open in Google Maps
+                                  🗺️ Navigate with Google Maps
                                 </a>
                               )}
                               {!req.hospital_name && !req.location && (
