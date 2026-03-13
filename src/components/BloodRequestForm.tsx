@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, MapPin, Phone, User, Droplets, ChevronDown, ChevronUp, Calendar, Clock } from "lucide-react";
+import { AlertCircle, MapPin, Phone, User, Droplets, ChevronDown, ChevronUp, Calendar, Clock, LocateFixed } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
