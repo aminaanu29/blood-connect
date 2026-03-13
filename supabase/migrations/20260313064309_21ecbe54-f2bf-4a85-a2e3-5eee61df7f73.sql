@@ -1,0 +1,1 @@
+ALTER TABLE public.blood_requests ADD COLUMN hospital_name text DEFAULT NULL;

@@ -23,6 +23,7 @@ interface Donor {
 const BloodRequestForm = () => {
   const [selectedGroup, setSelectedGroup] = useState("");
   const [urgency, setUrgency] = useState("");
+  const [hospitalName, setHospitalName] = useState("");
   const [location, setLocation] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [donors, setDonors] = useState<Donor[]>([]);
@@ -42,6 +43,7 @@ const BloodRequestForm = () => {
     const { error: insertError } = await supabase.from("blood_requests").insert({
       blood_group: selectedGroup,
       urgency: urgency || "Normal",
+      hospital_name: hospitalName || null,
       location: location || null,
       city: location || null,
       contact_number: contactNumber || null,
@@ -149,15 +151,29 @@ const BloodRequestForm = () => {
               </div>
             </div>
 
-            {/* Location */}
+            {/* Hospital Name */}
             <div className="mb-8">
               <label className="block text-sm font-medium text-foreground mb-3">
-                <MapPin className="w-4 h-4 inline mr-1" />
-                Location
+                🏥 Hospital Name
               </label>
               <input
                 type="text"
-                placeholder="Enter hospital or area name"
+                placeholder="e.g. Apollo Hospital, AIIMS Delhi"
+                value={hospitalName}
+                onChange={(e) => setHospitalName(e.target.value)}
+                className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+              />
+            </div>
+
+            {/* Location / Address */}
+            <div className="mb-8">
+              <label className="block text-sm font-medium text-foreground mb-3">
+                <MapPin className="w-4 h-4 inline mr-1" />
+                Hospital Address / Area
+              </label>
+              <input
+                type="text"
+                placeholder="Full address or area for navigation"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"

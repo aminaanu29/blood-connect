@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Heart, MapPin, Phone, Droplets, LogOut, User, Calendar, CheckCircle, XCircle, AlertCircle, Clock } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Heart, MapPin, Phone, Droplets, LogOut, User, Calendar, CheckCircle, XCircle, AlertCircle, Clock, Navigation, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ interface BloodRequest {
   urgency: string;
   location: string | null;
   city: string | null;
+  hospital_name: string | null;
   contact_number: string | null;
   status: string;
   created_at: string;
@@ -46,6 +47,7 @@ const DonorDashboard = () => {
   const [profile, setProfile] = useState<DonorProfile | null>(null);
   const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [acceptedRequests, setAcceptedRequests] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -257,48 +259,131 @@ const DonorDashboard = () => {
               <div className="space-y-3">
                 {bloodRequests.map((req) => {
                   const timeAgo = getTimeAgo(req.created_at);
+                  const isAccepted = acceptedRequests.has(req.id);
+                  const googleMapsUrl = req.location
+                    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                        (req.hospital_name ? req.hospital_name + ", " : "") + req.location
+                      )}`
+                    : req.hospital_name
+                    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(req.hospital_name)}`
+                    : null;
+
                   return (
                     <div
                       key={req.id}
-                      className="p-4 rounded-xl border border-border bg-background"
+                      className="rounded-xl border border-border bg-background overflow-hidden"
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="bg-primary/10 text-primary font-bold text-xs px-2.5 py-0.5 rounded-full">
-                            {req.blood_group}
-                          </span>
-                          <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
-                            req.urgency === "Critical"
-                              ? "bg-destructive/10 text-destructive"
-                              : req.urgency === "Urgent"
-                              ? "bg-orange-100 text-orange-700"
-                              : "bg-muted text-muted-foreground"
-                          }`}>
-                            <AlertCircle className="w-3 h-3 inline mr-1" />
-                            {req.urgency}
+                      <div className="p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="bg-primary/10 text-primary font-bold text-xs px-2.5 py-0.5 rounded-full">
+                              {req.blood_group}
+                            </span>
+                            <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
+                              req.urgency === "Critical"
+                                ? "bg-destructive/10 text-destructive"
+                                : req.urgency === "Urgent"
+                                ? "bg-orange-100 text-orange-700"
+                                : "bg-muted text-muted-foreground"
+                            }`}>
+                              <AlertCircle className="w-3 h-3 inline mr-1" />
+                              {req.urgency}
+                            </span>
+                          </div>
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Clock className="w-3 h-3" /> {timeAgo}
                           </span>
                         </div>
-                        <span className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> {timeAgo}
-                        </span>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            {req.hospital_name && (
+                              <p className="text-sm text-foreground flex items-center gap-1 font-medium">
+                                <Building2 className="w-3.5 h-3.5 text-muted-foreground" /> {req.hospital_name}
+                              </p>
+                            )}
+                            {req.location && (
+                              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                <MapPin className="w-3.5 h-3.5" /> {req.location}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {req.contact_number && (
+                              <a
+                                href={`tel:${req.contact_number}`}
+                                className="text-xs text-primary font-medium hover:underline flex items-center gap-1"
+                              >
+                                <Phone className="w-3.5 h-3.5" /> Call
+                              </a>
+                            )}
+                            {!isAccepted && (
+                              <Button
+                                size="sm"
+                                variant="hope"
+                                className="text-xs gap-1"
+                                onClick={() => {
+                                  setAcceptedRequests((prev) => new Set(prev).add(req.id));
+                                  toast.success("Request accepted! Hospital details are shown below.");
+                                }}
+                              >
+                                <CheckCircle className="w-3.5 h-3.5" /> Accept
+                              </Button>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          {req.location && (
-                            <p className="text-sm text-foreground flex items-center gap-1">
-                              <MapPin className="w-3.5 h-3.5 text-muted-foreground" /> {req.location}
-                            </p>
-                          )}
-                        </div>
-                        {req.contact_number && (
-                          <a
-                            href={`tel:${req.contact_number}`}
-                            className="text-xs text-primary font-medium hover:underline flex items-center gap-1"
+
+                      {/* Location details shown after accepting */}
+                      <AnimatePresence>
+                        {isAccepted && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="border-t border-border bg-primary/5 px-4 py-4"
                           >
-                            <Phone className="w-3.5 h-3.5" /> Call Requester
-                          </a>
+                            <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-1.5">
+                              <Navigation className="w-4 h-4 text-primary" /> Hospital Details
+                            </h4>
+                            <div className="space-y-2 text-sm">
+                              {req.hospital_name && (
+                                <div className="flex items-center gap-2 text-foreground">
+                                  <Building2 className="w-4 h-4 text-primary" />
+                                  <span className="font-medium">{req.hospital_name}</span>
+                                </div>
+                              )}
+                              {req.location && (
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                  <MapPin className="w-4 h-4 text-primary" />
+                                  <span>{req.location}</span>
+                                </div>
+                              )}
+                              {req.contact_number && (
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                  <Phone className="w-4 h-4 text-primary" />
+                                  <a href={`tel:${req.contact_number}`} className="text-primary hover:underline font-medium">
+                                    {req.contact_number}
+                                  </a>
+                                </div>
+                              )}
+                              {googleMapsUrl && (
+                                <a
+                                  href={googleMapsUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mt-3 inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
+                                >
+                                  <Navigation className="w-4 h-4" />
+                                  Open in Google Maps
+                                </a>
+                              )}
+                              {!req.hospital_name && !req.location && (
+                                <p className="text-muted-foreground italic">No location details were provided for this request.</p>
+                              )}
+                            </div>
+                          </motion.div>
                         )}
-                      </div>
+                      </AnimatePresence>
                     </div>
                   );
                 })}

@@ -20,6 +20,7 @@ export type Database = {
           city: string | null
           contact_number: string | null
           created_at: string
+          hospital_name: string | null
           id: string
           location: string | null
           status: string
@@ -30,6 +31,7 @@ export type Database = {
           city?: string | null
           contact_number?: string | null
           created_at?: string
+          hospital_name?: string | null
           id?: string
           location?: string | null
           status?: string
@@ -40,6 +42,7 @@ export type Database = {
           city?: string | null
           contact_number?: string | null
           created_at?: string
+          hospital_name?: string | null
           id?: string
           location?: string | null
           status?: string
