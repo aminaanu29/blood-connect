@@ -27,6 +27,8 @@ interface BloodRequest {
   city: string | null;
   hospital_name: string | null;
   contact_number: string | null;
+  latitude: number | null;
+  longitude: number | null;
   status: string;
   created_at: string;
 }
