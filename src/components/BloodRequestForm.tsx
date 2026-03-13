@@ -64,6 +64,15 @@ const BloodRequestForm = () => {
     setLoading(true);
 
     // 1. Insert the blood request into the database
+    const parsedLat = latitude ? parseFloat(latitude) : null;
+    const parsedLng = longitude ? parseFloat(longitude) : null;
+
+    if ((latitude && isNaN(parsedLat!)) || (longitude && isNaN(parsedLng!))) {
+      toast.error("Please enter valid latitude and longitude values");
+      setLoading(false);
+      return;
+    }
+
     const { error: insertError } = await supabase.from("blood_requests").insert({
       blood_group: selectedGroup,
       urgency: urgency || "Normal",
@@ -71,6 +80,8 @@ const BloodRequestForm = () => {
       location: location || null,
       city: location || null,
       contact_number: contactNumber || null,
+      latitude: parsedLat,
+      longitude: parsedLng,
     });
 
     if (insertError) {
