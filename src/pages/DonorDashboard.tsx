@@ -47,6 +47,7 @@ const DonorDashboard = () => {
   const [profile, setProfile] = useState<DonorProfile | null>(null);
   const [bloodRequests, setBloodRequests] = useState<BloodRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [acceptedRequests, setAcceptedRequests] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const loadDashboard = async () => {
