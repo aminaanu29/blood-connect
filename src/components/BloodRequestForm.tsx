@@ -26,10 +26,34 @@ const BloodRequestForm = () => {
   const [hospitalName, setHospitalName] = useState("");
   const [location, setLocation] = useState("");
   const [contactNumber, setContactNumber] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [detectingLocation, setDetectingLocation] = useState(false);
   const [donors, setDonors] = useState<Donor[]>([]);
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [expandedDonor, setExpandedDonor] = useState<string | null>(null);
+
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+    setDetectingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitude(position.coords.latitude.toFixed(6));
+        setLongitude(position.coords.longitude.toFixed(6));
+        setDetectingLocation(false);
+        toast.success("Location detected successfully!");
+      },
+      () => {
+        setDetectingLocation(false);
+        toast.error("Unable to detect location. Please enter coordinates manually.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   const handleSubmit = async () => {
     if (!selectedGroup) {
