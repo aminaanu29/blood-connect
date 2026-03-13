@@ -262,7 +262,11 @@ const DonorDashboard = () => {
                 {bloodRequests.map((req) => {
                   const timeAgo = getTimeAgo(req.created_at);
                   const isAccepted = acceptedRequests.has(req.id);
-                  const googleMapsUrl = req.location
+
+                  // Prefer lat/lng for accurate navigation, fall back to text-based search
+                  const googleMapsUrl = req.latitude && req.longitude
+                    ? `https://www.google.com/maps/search/?api=1&query=${req.latitude},${req.longitude}`
+                    : req.location
                     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                         (req.hospital_name ? req.hospital_name + ", " : "") + req.location
                       )}`
