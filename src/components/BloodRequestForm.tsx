@@ -23,6 +23,7 @@ interface Donor {
 const BloodRequestForm = () => {
   const [selectedGroup, setSelectedGroup] = useState("");
   const [urgency, setUrgency] = useState("");
+  const [hospitalName, setHospitalName] = useState("");
   const [location, setLocation] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [donors, setDonors] = useState<Donor[]>([]);
