@@ -329,10 +329,10 @@ const DonorDashboard = () => {
                                 className="text-xs gap-1"
                                 onClick={() => {
                                   setAcceptedRequests((prev) => new Set(prev).add(req.id));
-                                  toast.success("Request accepted! Hospital details are shown below.");
+                                  toast.success("Thank you for helping save a life ❤️");
                                 }}
                               >
-                                <CheckCircle className="w-3.5 h-3.5" /> Accept
+                                <CheckCircle className="w-3.5 h-3.5" /> Confirm Donation
                               </Button>
                             )}
                           </div>
