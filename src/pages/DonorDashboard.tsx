@@ -346,8 +346,16 @@ const DonorDashboard = () => {
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            className="border-t border-border bg-primary/5 px-4 py-4"
+                            className="border-t border-border bg-primary/5 px-4 py-5"
                           >
+                            <div className="text-center mb-4">
+                              <p className="text-base font-semibold text-foreground">
+                                Thank you for helping save a life ❤️
+                              </p>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Here is the hospital location for your donation.
+                              </p>
+                            </div>
                             <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-1.5">
                               <Navigation className="w-4 h-4 text-primary" /> Hospital Details
                             </h4>
