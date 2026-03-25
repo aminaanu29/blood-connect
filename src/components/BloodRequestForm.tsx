@@ -25,7 +25,8 @@ interface Donor {
 const BloodRequestForm = () => {
   const [selectedGroup, setSelectedGroup] = useState("");
   const [urgency, setUrgency] = useState("");
-  const [hospitalName, setHospitalName] = useState("");
+  const [selectedHospital, setSelectedHospital] = useState<HospitalBranch | null>(null);
+  const [manualHospitalName, setManualHospitalName] = useState("");
   const [location, setLocation] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [latitude, setLatitude] = useState("");
@@ -35,6 +36,7 @@ const BloodRequestForm = () => {
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [expandedDonor, setExpandedDonor] = useState<string | null>(null);
+  const [useManualEntry, setUseManualEntry] = useState(false);
 
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
