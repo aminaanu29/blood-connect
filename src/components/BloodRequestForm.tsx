@@ -77,15 +77,24 @@ const BloodRequestForm = () => {
       return;
     }
 
+    // Derive hospital info from selector or manual entry
+    const hospitalName = selectedHospital
+      ? `${selectedHospital.name} — ${selectedHospital.branch}`
+      : manualHospitalName || null;
+    const finalLocation = selectedHospital ? selectedHospital.address : (location || null);
+    const finalCity = selectedHospital ? selectedHospital.city : (location || null);
+    const finalLat = selectedHospital ? selectedHospital.latitude : parsedLat;
+    const finalLng = selectedHospital ? selectedHospital.longitude : parsedLng;
+
     const { error: insertError } = await supabase.from("blood_requests").insert({
       blood_group: selectedGroup,
       urgency: urgency || "Normal",
-      hospital_name: hospitalName || null,
-      location: location || null,
-      city: location || null,
+      hospital_name: hospitalName,
+      location: finalLocation,
+      city: finalCity,
       contact_number: contactNumber || null,
-      latitude: parsedLat,
-      longitude: parsedLng,
+      latitude: finalLat,
+      longitude: finalLng,
     });
 
     if (insertError) {
