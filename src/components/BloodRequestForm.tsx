@@ -199,70 +199,107 @@ const BloodRequestForm = () => {
               </div>
             </div>
 
-            {/* Hospital Name */}
+            {/* Hospital Selection */}
             <div className="mb-8">
               <label className="block text-sm font-medium text-foreground mb-3">
-                🏥 Hospital Name
+                🏥 Select Hospital & Branch
               </label>
-              <input
-                type="text"
-                placeholder="e.g. Apollo Hospital, AIIMS Delhi"
-                value={hospitalName}
-                onChange={(e) => setHospitalName(e.target.value)}
-                className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+              <HospitalSelector
+                selectedHospital={selectedHospital}
+                onSelect={(h) => {
+                  setSelectedHospital(h);
+                  setUseManualEntry(false);
+                }}
+                onClear={() => setSelectedHospital(null)}
               />
-            </div>
-
-            {/* Location / Address */}
-            <div className="mb-8">
-              <label className="block text-sm font-medium text-foreground mb-3">
-                <MapPin className="w-4 h-4 inline mr-1" />
-                Hospital Address / Area
-              </label>
-              <input
-                type="text"
-                placeholder="Full address or area for navigation"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
-              />
-            </div>
-
-            {/* Hospital Location Coordinates */}
-            <div className="mb-8">
-              <label className="block text-sm font-medium text-foreground mb-3">
-                <MapPin className="w-4 h-4 inline mr-1" />
-                Hospital Coordinates (for accurate navigation)
-              </label>
-              <div className="flex gap-3 mb-3">
-                <input
-                  type="text"
-                  placeholder="Latitude (e.g. 11.2588)"
-                  value={latitude}
-                  onChange={(e) => setLatitude(e.target.value)}
-                  className="flex-1 h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
-                />
-                <input
-                  type="text"
-                  placeholder="Longitude (e.g. 75.7804)"
-                  value={longitude}
-                  onChange={(e) => setLongitude(e.target.value)}
-                  className="flex-1 h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
-                />
-              </div>
               <button
                 type="button"
-                onClick={handleDetectLocation}
-                disabled={detectingLocation}
-                className="inline-flex items-center gap-2 text-sm text-primary font-medium hover:underline disabled:opacity-50"
+                onClick={() => {
+                  setUseManualEntry(!useManualEntry);
+                  setSelectedHospital(null);
+                }}
+                className="mt-2 text-xs text-primary font-medium hover:underline"
               >
-                <LocateFixed className={`w-4 h-4 ${detectingLocation ? "animate-spin" : ""}`} />
-                {detectingLocation ? "Detecting..." : "Auto-detect hospital location"}
+                {useManualEntry ? "← Back to hospital search" : "Hospital not listed? Enter manually"}
               </button>
-              <p className="text-xs text-muted-foreground mt-2">
-                Tip: Use auto-detect while at the hospital for accurate coordinates, or find them on Google Maps.
-              </p>
             </div>
+
+            {/* Manual Hospital Entry (fallback) */}
+            {useManualEntry && (
+              <>
+                <div className="mb-8">
+                  <label className="block text-sm font-medium text-foreground mb-3">
+                    🏥 Hospital Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Apollo Hospital, AIIMS Delhi"
+                    value={manualHospitalName}
+                    onChange={(e) => setManualHospitalName(e.target.value)}
+                    className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+                  />
+                </div>
+
+                <div className="mb-8">
+                  <label className="block text-sm font-medium text-foreground mb-3">
+                    <MapPin className="w-4 h-4 inline mr-1" />
+                    Hospital Address / Area
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Full address or area for navigation"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+                  />
+                </div>
+
+                <div className="mb-8">
+                  <label className="block text-sm font-medium text-foreground mb-3">
+                    <MapPin className="w-4 h-4 inline mr-1" />
+                    Hospital Coordinates (for accurate navigation)
+                  </label>
+                  <div className="flex gap-3 mb-3">
+                    <input
+                      type="text"
+                      placeholder="Latitude (e.g. 11.2588)"
+                      value={latitude}
+                      onChange={(e) => setLatitude(e.target.value)}
+                      className="flex-1 h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Longitude (e.g. 75.7804)"
+                      value={longitude}
+                      onChange={(e) => setLongitude(e.target.value)}
+                      className="flex-1 h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleDetectLocation}
+                    disabled={detectingLocation}
+                    className="inline-flex items-center gap-2 text-sm text-primary font-medium hover:underline disabled:opacity-50"
+                  >
+                    <LocateFixed className={`w-4 h-4 ${detectingLocation ? "animate-spin" : ""}`} />
+                    {detectingLocation ? "Detecting..." : "Auto-detect hospital location"}
+                  </button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Tip: Use auto-detect while at the hospital for accurate coordinates, or find them on Google Maps.
+                  </p>
+                </div>
+              </>
+            )}
+
+            {/* Selected Hospital Info Preview */}
+            {selectedHospital && (
+              <div className="mb-8 rounded-xl border border-primary/20 bg-primary/5 p-4">
+                <p className="text-xs text-muted-foreground mb-1">Selected hospital details</p>
+                <p className="text-sm font-medium text-foreground">{selectedHospital.name} — {selectedHospital.branch}</p>
+                <p className="text-xs text-muted-foreground mt-1">{selectedHospital.address}</p>
+                <p className="text-xs text-muted-foreground">📍 {selectedHospital.latitude}, {selectedHospital.longitude}</p>
+              </div>
+            )}
 
             {/* Contact */}
             <div className="mb-8">
