@@ -280,7 +280,7 @@ const DonorDashboard = () => {
                       className="rounded-xl border border-border bg-background overflow-hidden"
                     >
                       <div className="p-4">
-                        <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-2">
                             <span className="bg-primary/10 text-primary font-bold text-xs px-2.5 py-0.5 rounded-full">
                               {req.blood_group}
@@ -300,101 +300,93 @@ const DonorDashboard = () => {
                             <Clock className="w-3 h-3" /> {timeAgo}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-1">
-                            {req.hospital_name && (
-                              <p className="text-sm text-foreground flex items-center gap-1 font-medium">
-                                <Building2 className="w-3.5 h-3.5 text-muted-foreground" /> {req.hospital_name}
-                              </p>
-                            )}
-                            {req.location && (
-                              <p className="text-sm text-muted-foreground flex items-center gap-1">
-                                <MapPin className="w-3.5 h-3.5" /> {req.location}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {req.contact_number && (
-                              <a
-                                href={`tel:${req.contact_number}`}
-                                className="text-xs text-primary font-medium hover:underline flex items-center gap-1"
-                              >
-                                <Phone className="w-3.5 h-3.5" /> Call
+
+                        {/* Always-visible request details */}
+                        <div className="space-y-2 mb-4">
+                          {req.hospital_name && (
+                            <p className="text-sm text-foreground flex items-center gap-1.5 font-medium">
+                              <Building2 className="w-4 h-4 text-primary" /> {req.hospital_name}
+                            </p>
+                          )}
+                          {req.location && (
+                            <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                              <MapPin className="w-4 h-4 text-primary" /> {req.location}
+                            </p>
+                          )}
+                          {req.contact_number && (
+                            <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                              <Phone className="w-4 h-4 text-primary" />
+                              <a href={`tel:${req.contact_number}`} className="text-primary hover:underline font-medium">
+                                {req.contact_number}
                               </a>
-                            )}
-                            {!isAccepted && (
-                              <Button
-                                size="sm"
-                                variant="hope"
-                                className="text-xs gap-1"
-                                onClick={() => {
-                                  setAcceptedRequests((prev) => new Set(prev).add(req.id));
-                                  toast.success("Thank you for helping save a life ❤️");
-                                }}
-                              >
-                                <CheckCircle className="w-3.5 h-3.5" /> Confirm Donation
-                              </Button>
-                            )}
-                          </div>
+                            </p>
+                          )}
+                          {!req.hospital_name && !req.location && !req.contact_number && (
+                            <p className="text-xs text-muted-foreground italic">No additional details provided.</p>
+                          )}
+                        </div>
+
+                        {/* Action buttons — always visible */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {req.contact_number && (
+                            <a
+                              href={`tel:${req.contact_number}`}
+                              className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg border border-border bg-background text-foreground hover:bg-muted transition-colors"
+                            >
+                              <Phone className="w-3.5 h-3.5" /> Call Requestee
+                            </a>
+                          )}
+                          {googleMapsUrl && (
+                            <a
+                              href={googleMapsUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg border border-border bg-background text-foreground hover:bg-muted transition-colors"
+                            >
+                              <Navigation className="w-3.5 h-3.5" /> View on Maps
+                            </a>
+                          )}
+                          {!isAccepted ? (
+                            <Button
+                              size="sm"
+                              variant="hope"
+                              className="text-xs gap-1 ml-auto"
+                              onClick={() => {
+                                setAcceptedRequests((prev) => new Set(prev).add(req.id));
+                                toast.success("Thank you for helping save a life ❤️");
+                              }}
+                            >
+                              <CheckCircle className="w-3.5 h-3.5" /> Confirm Donation
+                            </Button>
+                          ) : (
+                            <span className="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold text-accent">
+                              <CheckCircle className="w-3.5 h-3.5" /> Donation Confirmed ❤️
+                            </span>
+                          )}
                         </div>
                       </div>
 
-                      {/* Location details shown after accepting */}
+                      {/* Confirmation thank-you panel */}
                       <AnimatePresence>
-                        {isAccepted && (
+                        {isAccepted && googleMapsUrl && (
                           <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            className="border-t border-border bg-primary/5 px-4 py-5"
+                            className="border-t border-border bg-primary/5 px-4 py-4"
                           >
-                            <div className="text-center mb-4">
-                              <p className="text-base font-semibold text-foreground">
-                                Thank you for helping save a life ❤️
-                              </p>
-                              <p className="text-sm text-muted-foreground mt-1">
-                                Here is the hospital location for your donation.
-                              </p>
-                            </div>
-                            <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-1.5">
-                              <Navigation className="w-4 h-4 text-primary" /> Hospital Details
-                            </h4>
-                            <div className="space-y-2 text-sm">
-                              {req.hospital_name && (
-                                <div className="flex items-center gap-2 text-foreground">
-                                  <Building2 className="w-4 h-4 text-primary" />
-                                  <span className="font-medium">{req.hospital_name}</span>
-                                </div>
-                              )}
-                              {req.location && (
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                  <MapPin className="w-4 h-4 text-primary" />
-                                  <span>{req.location}</span>
-                                </div>
-                              )}
-                              {req.contact_number && (
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                  <Phone className="w-4 h-4 text-primary" />
-                                  <a href={`tel:${req.contact_number}`} className="text-primary hover:underline font-medium">
-                                    {req.contact_number}
-                                  </a>
-                                </div>
-                              )}
-                              {googleMapsUrl && (
-                                <a
-                                  href={googleMapsUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="mt-3 inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-3 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity shadow-md"
-                                >
-                                  <Navigation className="w-4 h-4" />
-                                  🗺️ Navigate with Google Maps
-                                </a>
-                              )}
-                              {!req.hospital_name && !req.location && (
-                                <p className="text-muted-foreground italic">No location details were provided for this request.</p>
-                              )}
-                            </div>
+                            <p className="text-sm text-foreground font-medium text-center mb-3">
+                              Thank you for helping save a life ❤️ Navigate to the hospital below.
+                            </p>
+                            <a
+                              href={googleMapsUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-3 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity shadow-md"
+                            >
+                              <Navigation className="w-4 h-4" />
+                              🗺️ Navigate with Google Maps
+                            </a>
                           </motion.div>
                         )}
                       </AnimatePresence>
