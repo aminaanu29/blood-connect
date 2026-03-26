@@ -118,9 +118,26 @@ const DonorDashboard = () => {
     navigate("/");
   };
 
+  const getDaysUntilEligible = () => {
+    if (!profile?.last_donation_date) return 0;
+    const lastDonation = new Date(profile.last_donation_date);
+    const eligibleDate = new Date(lastDonation);
+    eligibleDate.setDate(eligibleDate.getDate() + 90);
+    const daysLeft = Math.ceil((eligibleDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    return Math.max(0, daysLeft);
+  };
+
+  const isInCooldown = () => getDaysUntilEligible() > 0;
+
   const toggleAvailability = async () => {
     if (!profile) return;
     const newStatus = !profile.is_available;
+
+    if (newStatus && isInCooldown()) {
+      toast.error(`You can donate again in ${getDaysUntilEligible()} days. Please wait for the 90-day recovery period.`);
+      return;
+    }
+
     const { error } = await supabase
       .from("donors")
       .update({ is_available: newStatus })
@@ -133,6 +150,25 @@ const DonorDashboard = () => {
 
     setProfile({ ...profile, is_available: newStatus });
     toast.success(newStatus ? "You're now available to donate!" : "Availability turned off.");
+  };
+
+  const handleConfirmDonation = async (requestId: string) => {
+    if (!profile) return;
+
+    const today = new Date().toISOString().split("T")[0];
+    const { error } = await supabase
+      .from("donors")
+      .update({ is_available: false, last_donation_date: today })
+      .eq("id", profile.id);
+
+    if (error) {
+      toast.error("Failed to update your profile.");
+      return;
+    }
+
+    setProfile({ ...profile, is_available: false, last_donation_date: today });
+    setAcceptedRequests((prev) => new Set(prev).add(requestId));
+    toast.success("🎉 Your donation has been recorded! You're a real hero — thank you for saving a life ❤️", { duration: 6000 });
   };
 
   if (loading) {
