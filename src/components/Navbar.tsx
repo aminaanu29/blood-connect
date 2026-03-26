@@ -33,6 +33,14 @@ const Navbar = () => {
               >
                 {item}
               </Link>
+            ) : item === "NSS Camps" ? (
+              <Link
+                key={item}
+                to="/nss"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {item}
+              </Link>
             ) : (
               <a
                 key={item}
