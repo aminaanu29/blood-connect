@@ -212,9 +212,13 @@ const DonorRegister = () => {
               </label>
               <input
                 type="tel"
-                placeholder="+91 98765 43210"
+                placeholder="9876543210"
                 value={form.phone}
-                onChange={(e) => set("phone", e.target.value)}
+                maxLength={10}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, "");
+                  set("phone", val);
+                }}
                 className={inputClass}
               />
               {errors.phone && (
