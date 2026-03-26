@@ -111,9 +111,13 @@ const DonorSignup = () => {
               />
               <input
                 type="tel"
-                placeholder="Phone number"
+                placeholder="9876543210"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                maxLength={10}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, "");
+                  setPhone(val);
+                }}
                 className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
               />
 

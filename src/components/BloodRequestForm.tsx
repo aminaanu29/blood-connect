@@ -309,9 +309,13 @@ const BloodRequestForm = () => {
               </label>
               <input
                 type="tel"
-                placeholder="Your phone number"
+                placeholder="9876543210"
                 value={contactNumber}
-                onChange={(e) => setContactNumber(e.target.value)}
+                maxLength={10}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, "");
+                  setContactNumber(val);
+                }}
                 className="w-full h-12 rounded-xl border-2 border-border bg-background px-4 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
               />
             </div>

@@ -26,9 +26,8 @@ const registerSchema = z
     phone: z
       .string()
       .trim()
-      .min(10, "Phone number must be at least 10 digits")
-      .max(15)
-      .regex(/^[+\d\s()-]+$/, "Invalid phone number"),
+      .length(10, "Phone number must be exactly 10 digits")
+      .regex(/^\d{10}$/, "Phone number must contain only digits"),
     bloodGroup: z.string().min(1, "Blood group is required"),
     city: z.string().trim().min(1, "City is required").max(100),
     state: z.string().trim().min(1, "State is required").max(100),
@@ -212,9 +211,13 @@ const DonorRegister = () => {
               </label>
               <input
                 type="tel"
-                placeholder="+91 98765 43210"
+                placeholder="9876543210"
                 value={form.phone}
-                onChange={(e) => set("phone", e.target.value)}
+                maxLength={10}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, "");
+                  set("phone", val);
+                }}
                 className={inputClass}
               />
               {errors.phone && (
