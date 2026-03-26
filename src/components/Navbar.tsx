@@ -4,7 +4,7 @@ import { Heart, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-const navItems = ["How It Works", "Request Blood", "Become a Donor"];
+const navItems = ["How It Works", "Request Blood", "NSS Camps", "Become a Donor"];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
