@@ -49,7 +49,7 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            HEMOLINK connects patients with nearby donors and college NSS groups
+            HEMOLINK connects patients with nearby donors
             in real-time. Fast, trustworthy, and built to save lives.
           </motion.p>
 
@@ -81,7 +81,7 @@ const HeroSection = () => {
           >
             {[
               { number: "2,400+", label: "Active Donors" },
-              { number: "180+", label: "NSS Colleges" },
+              { number: "500+", label: "Lives Saved" },
               { number: "98%", label: "Match Rate" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">

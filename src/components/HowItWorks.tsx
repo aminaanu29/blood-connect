@@ -5,7 +5,7 @@ const steps = [
   {
     icon: UserPlus,
     title: "Register",
-    description: "Sign up as a donor, receiver, or NSS group in under a minute.",
+    description: "Sign up as a donor or receiver in under a minute.",
   },
   {
     icon: Search,

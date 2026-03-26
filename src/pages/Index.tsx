@@ -3,7 +3,6 @@ import HeroSection from "@/components/HeroSection";
 import HowItWorks from "@/components/HowItWorks";
 import BloodRequestForm from "@/components/BloodRequestForm";
 
-import NSSSection from "@/components/NSSSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -14,7 +13,7 @@ const Index = () => {
       <HowItWorks />
       <BloodRequestForm />
       
-      <NSSSection />
+      
       <Footer />
     </div>
   );
