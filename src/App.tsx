@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import DonorRegister from "./pages/DonorRegister";
 import DonorLogin from "./pages/DonorLogin";
 import DonorDashboard from "./pages/DonorDashboard";
+import NSSShowcase from "./pages/NSSShowcase";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/donor-register" element={<DonorRegister />} />
           <Route path="/donor-login" element={<DonorLogin />} />
           <Route path="/donor-dashboard" element={<DonorDashboard />} />
+          <Route path="/nss" element={<NSSShowcase />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
