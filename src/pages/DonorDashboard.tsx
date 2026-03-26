@@ -272,14 +272,21 @@ const DonorDashboard = () => {
               </div>
             </div>
 
-            <div className="mt-6 pt-5 border-t border-border">
+            <div className="mt-6 pt-5 border-t border-border flex items-center gap-3 flex-wrap">
               <Button
                 variant={profile.is_available ? "outline" : "hope"}
                 size="default"
                 onClick={toggleAvailability}
+                disabled={!profile.is_available && isInCooldown()}
               >
                 {profile.is_available ? "Mark as Unavailable" : "Mark as Available"}
               </Button>
+              {isInCooldown() && (
+                <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" />
+                  Eligible to donate again in <strong>{getDaysUntilEligible()} days</strong>
+                </span>
+              )}
             </div>
           </div>
 
@@ -387,10 +394,7 @@ const DonorDashboard = () => {
                               size="sm"
                               variant="hope"
                               className="text-xs gap-1 ml-auto"
-                              onClick={() => {
-                                setAcceptedRequests((prev) => new Set(prev).add(req.id));
-                                toast.success("Thank you for helping save a life ❤️");
-                              }}
+                              onClick={() => handleConfirmDonation(req.id)}
                             >
                               <CheckCircle className="w-3.5 h-3.5" /> Confirm Donation
                             </Button>
