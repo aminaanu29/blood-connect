@@ -21,7 +21,7 @@ const Footer = () => {
           {[
             {
               title: "Platform",
-              links: ["Request Blood", "Become a Donor", "NSS Registration", "How It Works"],
+              links: ["Request Blood", "Become a Donor", "How It Works"],
             },
             {
               title: "Resources",
